@@ -118,7 +118,8 @@ async function loadModels() {
     // create a new chat instance
     const chat = new Chat(
       $("#agent-properties-1").val(),
-      $("#agent-properties-2").val()
+      $("#agent-properties-2").val(),
+      insertMessage // Pass the insertMessage function as a callback
     );
 
     await chat.initialize(
@@ -157,7 +158,7 @@ function startChat() {
 
   if (window.chat.stopped) {
     console.log("Resuming chat...");
-    windows.chat.resume();
+    window.chat.resume();
   } else {
     console.log("Starting chat...");
     // Collapse the configuration section
@@ -184,13 +185,23 @@ function stopChat() {
   $("#start-chat").prop("disabled", false);
   $("#load-models").prop("disabled", false);
 
-  // Expand the configuration section
-  $("#configCollapse").collapse("show");
-
   window.chat.stop();
 }
 
 function scrollChatToBottom() {
   const chatBox = $("#chat-box");
   chatBox.scrollTop(chatBox[0].scrollHeight);
+}
+
+// Add this function after the existing functions
+function insertMessage(agent, content) {
+  const chatBox = $("#chat-box");
+  const messageDiv = $("<div>").addClass(`message ${agent}`);
+  const messageContent = $("<div>").addClass("message-content").text(content);
+
+  messageDiv.append(messageContent);
+  chatBox.append(messageDiv);
+
+  // Use the debounced scroll function
+  debouncedScrollChatToBottom();
 }

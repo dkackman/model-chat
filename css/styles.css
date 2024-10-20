@@ -17,11 +17,11 @@
     margin-bottom: 15px;
 }
 
-.message.sent {
+.message.agent-2 {
     justify-content: flex-end;
 }
 
-.message.received {
+.message.agent-1 {
     justify-content: flex-start;
 }
 
@@ -35,12 +35,12 @@
     line-height: 1.4;
 }
 
-.message.sent .message-content {
+.message.agent-2 .message-content {
     background-color: #0d6efd;
     border-bottom-right-radius: 0;
 }
 
-.message.received .message-content {
+.message.agent-1 .message-content {
     background-color: #6c757d;
     border-bottom-left-radius: 0;
 }
@@ -52,14 +52,14 @@
     height: 0;
 }
 
-.message.sent .message-content::after {
+.message.agent-2 .message-content::after {
     right: -10px;
     bottom: 0;
     border-top: 10px solid #0d6efd;
     border-right: 10px solid transparent;
 }
 
-.message.received .message-content::after {
+.message.agent-1 .message-content::after {
     left: -10px;
     bottom: 0;
     border-top: 10px solid #6c757d;

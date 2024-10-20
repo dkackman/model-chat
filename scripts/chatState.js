@@ -5,12 +5,12 @@
 class ChatState {
   constructor(agentProperties1, agentProperties2) {
     this.agentProperties1 = {
-      Role: "system",
-      Content: agentProperties1 ? agentProperties1.trim() : "",
+      role: "system",
+      content: agentProperties1 ? agentProperties1.trim() : "",
     };
     this.agentProperties2 = {
-      Role: "system",
-      Content: agentProperties2 ? agentProperties2.trim() : "",
+      role: "system",
+      content: agentProperties2 ? agentProperties2.trim() : "",
     };
 
     this.transcript = [];
@@ -46,16 +46,9 @@ class ChatState {
     return [this.agentProperties2, ...modifiedTranscript];
   }
 
-  addMessageForAgent1(content) {
+  addMessage(agent, content) {
     this.transcript.push({
-      role: "agent-1",
-      content: content ? content.trim() : "",
-    });
-  }
-
-  addMessageForAgent2(content) {
-    this.transcript.push({
-      role: "agent-2",
+      role: agent,
       content: content ? content.trim() : "",
     });
   }
