@@ -6,12 +6,14 @@ class Chat {
     agentProperties1,
     agentProperties2,
     onNewMessage,
+    onStreamingMessage,
     onUpdateLastMessage,
     onThinking
   ) {
     this.chatState = new ChatState(agentProperties1, agentProperties2);
     this.isStopped = false;
     this.onNewMessage = onNewMessage;
+    this.onStreamingMessage = onStreamingMessage;
     this.onUpdateLastMessage = onUpdateLastMessage;
     this.onThinking = onThinking;
   }
@@ -61,14 +63,14 @@ class Chat {
     while (!this.isStopped) {
       const agentLabel = this.agent1IsUser ? "agent-2" : "agent-1";
 
-      // Call the onThinking callback
       this.onThinking(agentLabel);
 
       const transcript = this.agent1IsUser
         ? this.chatState.getTranscriptForAgent2()
         : this.chatState.getTranscriptForAgent1();
       const request = {
-        stream: false,
+        stream: true,
+        stream_options: { include_usage: false },
         messages: transcript,
         model: this.agent1IsUser ? this.model2 : this.model1,
       };
@@ -76,6 +78,13 @@ class Chat {
         request
       );
 
+      // this streams the response to the ui
+      for await (const chunk of asyncChunkGenerator) {
+        const messagePart = chunk.choices[0]?.delta?.content;
+        this.onStreamingMessage(agentLabel, messagePart);
+      }
+
+      // this gets the final message and adds it to the chat state
       const message = this.agent1IsUser
         ? await this.engine.getMessage(this.model2)
         : await this.engine.getMessage(this.model1);

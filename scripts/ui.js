@@ -121,6 +121,7 @@ async function loadModels() {
       $("#agent-properties-1").val(),
       $("#agent-properties-2").val(),
       insertMessage,
+      streamingMessage,
       updateLastMessage,
       insertThinkingMessage
     );
@@ -212,6 +213,23 @@ function insertMessage(agent, content) {
 
 function insertThinkingMessage(agent) {
   insertMessage(agent, "Thinking...");
+}
+
+function streamingMessage(agent, content) {
+  const chatBox = $("#chat-box");
+  const lastMessage = chatBox.find(`.message.${agent}`).last();
+  let messageContent = lastMessage.find(".message-content");
+
+  // If the last message text is "Thinking...", replace it with an empty string
+  if (messageContent.text().trim() === "Thinking...") {
+    messageContent.text("");
+  }
+
+  // Append the new content to the existing message
+  messageContent.text(messageContent.text() + content);
+
+  // Use the debounced scroll function
+  debouncedScrollChatToBottom();
 }
 
 function updateLastMessage(agent, content) {
