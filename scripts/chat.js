@@ -7,6 +7,10 @@ class Chat {
     this.isStopped = false;
   }
 
+  get initialized() {
+    return this.engine !== undefined;
+  }
+
   async initialize(model1, model2, initProgressCallback) {
     this.engine = await webllm.CreateWebWorkerMLCEngine(
       new Worker(new URL("./worker.js", import.meta.url), { type: "module" }),

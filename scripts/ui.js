@@ -146,7 +146,7 @@ async function loadModels() {
 }
 
 function startChat() {
-  if (window.chat === undefined) {
+  if (window.chat === undefined || !window.chat.initialized) {
     console.log("Chat not initialized");
     return;
   }
