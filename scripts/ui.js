@@ -62,6 +62,8 @@ function restoreSelections() {
   if (properties2) $("#agent-properties-2").val(properties2);
 }
 
+const MAX_PROGRESS_LINES = 10;
+
 const initProgressCallback = (report) => {
   const chatBox = $("#chat-box");
   let consoleOutput = chatBox.find(".console-output").last();
@@ -71,8 +73,22 @@ const initProgressCallback = (report) => {
     chatBox.append(consoleOutput);
   }
 
-  // Append new text to the existing console output
-  consoleOutput.append(document.createTextNode("\n" + report.text));
+  // Split the existing content into lines
+  let lines = consoleOutput
+    .text()
+    .split("\n")
+    .filter((line) => line.trim() !== "");
+
+  // Add the new line
+  lines.push(report.text);
+
+  // Keep only the last MAX_PROGRESS_LINES lines
+  if (lines.length > MAX_PROGRESS_LINES) {
+    lines = lines.slice(-MAX_PROGRESS_LINES);
+  }
+
+  // Join the lines back together and update the console output
+  consoleOutput.text(lines.join("\n"));
 
   // Use the debounced scroll function
   debouncedScrollChatToBottom();
