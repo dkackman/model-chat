@@ -1,5 +1,19 @@
 import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
+const debouncedScrollChatToBottom = debounce(scrollChatToBottom, 100);
+
 $(document).ready(function () {
   const availableModels = webllm.prebuiltAppConfig.model_list.map(
     (m) => m.model_id
@@ -50,21 +64,18 @@ function restoreSelections() {
 
 const initProgressCallback = (report) => {
   const chatBox = $("#chat-box");
-  const consoleOutput = $("<div>").addClass("console-output");
+  let consoleOutput = chatBox.find(".console-output").last();
 
-  // Append new text to the existing console output, or create a new one
-  if (chatBox.children().last().hasClass("console-output")) {
-    chatBox
-      .children()
-      .last()
-      .append("\n" + report.text);
-  } else {
-    consoleOutput.text(report.text);
+  if (!consoleOutput.length) {
+    consoleOutput = $("<div>").addClass("console-output");
     chatBox.append(consoleOutput);
   }
 
-  // Scroll to the bottom of the chat box
-  chatBox.scrollTop(chatBox[0].scrollHeight);
+  // Append new text to the existing console output
+  consoleOutput.append(document.createTextNode("\n" + report.text));
+
+  // Use the debounced scroll function
+  debouncedScrollChatToBottom();
 };
 
 async function loadModels() {
@@ -72,7 +83,8 @@ async function loadModels() {
 
   // Disable the Load button
   $("#load-models").prop("disabled", true);
-
+  // Collapse the configuration section
+  $("#configCollapse").collapse("hide");
   // Clear previous chat content
   $("#chat-box").empty();
 
@@ -113,6 +125,20 @@ function startChat() {
   $("#start-chat").prop("disabled", true);
   $("#stop-chat").prop("disabled", false);
 
+  // Collapse the configuration section
+  $("#configCollapse").collapse("hide");
+
+  // Clear the console output
+  $("#chat-box").empty();
+
+  // Add a status message
+  $("#chat-box").append(
+    $("<div>").addClass("status-message").text("Models loaded. Chat is ready.")
+  );
+
+  // Scroll to the bottom
+  scrollChatToBottom();
+
   // Add your chat initialization logic here
 }
 
@@ -123,5 +149,26 @@ function stopChat() {
   $("#stop-chat").prop("disabled", true);
   $("#start-chat").prop("disabled", false);
 
+  // Expand the configuration section
+  $("#configCollapse").collapse("show");
+
   // Add your chat stopping logic here
+}
+
+function scrollChatToBottom() {
+  const chatBox = $("#chat-box");
+  chatBox.scrollTop(chatBox[0].scrollHeight);
+}
+
+function addChatMessage(message, isUser = false) {
+  const chatBox = $("#chat-box");
+  const messageDiv = $("<div>")
+    .addClass("message")
+    .addClass(isUser ? "sent" : "received");
+  const contentDiv = $("<div>").addClass("message-content").text(message);
+  messageDiv.append(contentDiv);
+  chatBox.append(messageDiv);
+
+  // Scroll to the bottom after adding a new message
+  scrollChatToBottom();
 }

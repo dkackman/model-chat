@@ -22,93 +22,116 @@
     ></script>
   </head>
 
-  <body>
-    <div class="container-fluid py-4">
+  <body class="d-flex flex-column vh-100">
+    <div class="container-fluid d-flex flex-column py-4 flex-grow-1">
       <!-- Configuration Section -->
-      <div class="row mb-4">
-        <div class="col-12">
-          <h2 class="mb-3">AI Configuration</h2>
-        </div>
-        <!-- LLM 1 Configuration -->
-        <div class="col-md-6 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">LLM 1</h5>
+      <div class="accordion mb-4" id="configAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="configHeading">
+            <button
+              class="accordion-button"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#configCollapse"
+              aria-expanded="true"
+              aria-controls="configCollapse"
+            >
+              AI Configuration
+            </button>
+          </h2>
+          <div
+            id="configCollapse"
+            class="accordion-collapse collapse show"
+            aria-labelledby="configHeading"
+            data-bs-parent="#configAccordion"
+          >
+            <div class="accordion-body">
               <div class="row">
-                <div class="col-md-6 mb-2">
-                  <label for="model-selection-1" class="form-label"
-                    >Model</label
-                  >
-                  <select
-                    id="model-selection-1"
-                    class="form-select form-select-sm"
-                  ></select>
+                <!-- LLM 1 Configuration -->
+                <div class="col-md-6 mb-3">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">LLM 1</h5>
+                      <div class="row">
+                        <div class="col-md-6 mb-2">
+                          <label for="model-selection-1" class="form-label"
+                            >Model</label
+                          >
+                          <select
+                            id="model-selection-1"
+                            class="form-select form-select-sm"
+                          ></select>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                          <label for="agent-properties-1" class="form-label"
+                            >Personality</label
+                          >
+                          <textarea
+                            id="agent-properties-1"
+                            class="form-control form-control-sm"
+                            rows="2"
+                            placeholder="Describe agent..."
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="col-md-6 mb-2">
-                  <label for="agent-properties-1" class="form-label"
-                    >Personality</label
-                  >
-                  <textarea
-                    id="agent-properties-1"
-                    class="form-control form-control-sm"
-                    rows="2"
-                    placeholder="Describe agent..."
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- LLM 2 Configuration -->
-        <div class="col-md-6 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">LLM 2</h5>
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <label for="model-selection-2" class="form-label"
-                    >Model</label
-                  >
-                  <select
-                    id="model-selection-2"
-                    class="form-select form-select-sm"
-                  ></select>
-                </div>
-                <div class="col-md-6 mb-2">
-                  <label for="agent-properties-2" class="form-label"
-                    >Personality</label
-                  >
-                  <textarea
-                    id="agent-properties-2"
-                    class="form-control form-control-sm"
-                    rows="2"
-                    placeholder="Describe agent..."
-                  ></textarea>
+                <!-- LLM 2 Configuration -->
+                <div class="col-md-6 mb-3">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">LLM 2</h5>
+                      <div class="row">
+                        <div class="col-md-6 mb-2">
+                          <label for="model-selection-2" class="form-label"
+                            >Model</label
+                          >
+                          <select
+                            id="model-selection-2"
+                            class="form-select form-select-sm"
+                          ></select>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                          <label for="agent-properties-2" class="form-label"
+                            >Personality</label
+                          >
+                          <textarea
+                            id="agent-properties-2"
+                            class="form-control form-control-sm"
+                            rows="2"
+                            placeholder="Describe agent..."
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       <!-- Chat Section -->
-      <div class="row">
-        <div class="col-12">
-          <h2 class="mb-3">Chat</h2>
-          <button id="load-models" class="btn btn-primary mb-3 me-2">
-            Load
-          </button>
-          <button id="start-chat" class="btn btn-success mb-3 me-2" disabled>
+      <div class="d-flex flex-column flex-grow-1">
+        <h2 class="mb-3">Chat</h2>
+        <div class="mb-3">
+          <button id="load-models" class="btn btn-primary me-2">Load</button>
+          <button id="start-chat" class="btn btn-success me-2" disabled>
             Chat
           </button>
-          <button id="stop-chat" class="btn btn-danger mb-3" disabled>
-            Stop
-          </button>
-          <div id="chat-box" class="chat-box">
-            <!-- Chat messages will be appended here -->
-          </div>
+          <button id="stop-chat" class="btn btn-danger" disabled>Stop</button>
+        </div>
+        <div id="chat-box" class="chat-box flex-grow-1">
+          <!-- Chat messages will be appended here -->
         </div>
       </div>
     </div>
+
+    <!-- Add Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 
     <!-- Custom JavaScript -->
     <script src="./scripts/ui.js" type="module"></script>
