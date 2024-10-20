@@ -41,7 +41,7 @@
 }
 
 .message.agent-1 .message-content {
-    background-color: #6c757d;
+    background-color: #c26d28;
     border-bottom-left-radius: 0;
 }
 
@@ -62,7 +62,7 @@
 .message.agent-1 .message-content::after {
     left: -10px;
     bottom: 0;
-    border-top: 10px solid #6c757d;
+    border-top: 10px solid #c26d28;
     border-left: 10px solid transparent;
 }
 
