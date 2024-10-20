@@ -35,20 +35,18 @@
             <div class="card-body">
               <h5 class="card-title">LLM 1 Configuration</h5>
               <div class="mb-3">
-                <label for="model-selection-1" class="form-label"
-                  >Select Model</label
-                >
+                <label for="model-selection-1" class="form-label">Model</label>
                 <select id="model-selection-1" class="form-select"></select>
               </div>
               <div class="mb-3">
                 <label for="agent-properties-1" class="form-label"
-                  >Agent Properties</label
+                  >Personality</label
                 >
                 <textarea
                   id="agent-properties-1"
                   class="form-control"
-                  rows="5"
-                  placeholder="Describe agent properties..."
+                  rows="3"
+                  placeholder="Describe agent personality..."
                 ></textarea>
               </div>
             </div>
@@ -60,20 +58,18 @@
             <div class="card-body">
               <h5 class="card-title">LLM 2 Configuration</h5>
               <div class="mb-3">
-                <label for="model-selection-2" class="form-label"
-                  >Select Model</label
-                >
+                <label for="model-selection-2" class="form-label">Model</label>
                 <select id="model-selection-2" class="form-select"></select>
               </div>
               <div class="mb-3">
                 <label for="agent-properties-2" class="form-label"
-                  >Agent Properties</label
+                  >Personality</label
                 >
                 <textarea
                   id="agent-properties-2"
                   class="form-control"
-                  rows="5"
-                  placeholder="Describe agent properties..."
+                  rows="3"
+                  placeholder="Describe agent personality..."
                 ></textarea>
               </div>
             </div>
@@ -84,7 +80,15 @@
       <div class="row">
         <div class="col-12">
           <h2 class="mb-3">Chat</h2>
-          <button id="start-chat" class="btn btn-primary mb-3">Start</button>
+          <button id="load-models" class="btn btn-primary mb-3 me-2">
+            Load
+          </button>
+          <button id="start-chat" class="btn btn-success mb-3 me-2" disabled>
+            Chat
+          </button>
+          <button id="stop-chat" class="btn btn-danger mb-3" disabled>
+            Stop
+          </button>
           <div id="chat-box" class="chat-box">
             <!-- Chat messages will be appended here -->
           </div>
@@ -93,6 +97,6 @@
     </div>
 
     <!-- Custom JavaScript -->
-    <script src="./scripts/index.js" type="module"></script>
+    <script src="./scripts/ui.js" type="module"></script>
   </body>
 </html>
