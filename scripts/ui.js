@@ -104,17 +104,10 @@ async function loadModels() {
   // Clear previous chat content
   $("#chat-box").empty();
 
-  // Get the selected models
-  const selectedModel1 = $("#model-selection-1").val();
-  const selectedModel2 = $("#model-selection-2").val();
-
-  // Create an array with the selected models
-  const selectedModels = [selectedModel1, selectedModel2];
-
   try {
     window.engine = await webllm.CreateWebWorkerMLCEngine(
       new Worker(new URL("./worker.js", import.meta.url), { type: "module" }),
-      selectedModels,
+      [$("#model-selection-1").val(), $("#model-selection-2").val()],
       { initProgressCallback: initProgressCallback }
     );
     console.log("Chat engine initialized successfully");
@@ -164,6 +157,7 @@ function stopChat() {
   // Disable the Stop button and enable the Chat button
   $("#stop-chat").prop("disabled", true);
   $("#start-chat").prop("disabled", false);
+  $("#load-models").prop("disabled", false);
 
   // Expand the configuration section
   $("#configCollapse").collapse("show");
@@ -174,17 +168,4 @@ function stopChat() {
 function scrollChatToBottom() {
   const chatBox = $("#chat-box");
   chatBox.scrollTop(chatBox[0].scrollHeight);
-}
-
-function addChatMessage(message, isUser = false) {
-  const chatBox = $("#chat-box");
-  const messageDiv = $("<div>")
-    .addClass("message")
-    .addClass(isUser ? "sent" : "received");
-  const contentDiv = $("<div>").addClass("message-content").text(message);
-  messageDiv.append(contentDiv);
-  chatBox.append(messageDiv);
-
-  // Scroll to the bottom after adding a new message
-  scrollChatToBottom();
 }
