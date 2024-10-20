@@ -1,6 +1,6 @@
 // maintains the state of the chat, including the transcript and the agent properties
 // transposes the chat transcript appropriately for each agent so that it views the
-// conversation from their perspective as assistant and the other as user
+// conversation from its perspective as assistant and the other as user
 
 class ChatState {
   constructor(agentProperties1, agentProperties2) {

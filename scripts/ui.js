@@ -1,4 +1,5 @@
 import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+import Chat from "./chat.js";
 
 const debounce = (func, wait) => {
   let timeout;
@@ -48,6 +49,7 @@ function saveSelections() {
   localStorage.setItem("model2", $("#model-selection-2").val());
   localStorage.setItem("properties1", $("#agent-properties-1").val());
   localStorage.setItem("properties2", $("#agent-properties-2").val());
+  localStorage.setItem("openingMessage", $("#agent-opening-message-1").val());
 }
 
 function restoreSelections() {
@@ -55,11 +57,13 @@ function restoreSelections() {
   const model2 = localStorage.getItem("model2");
   const properties1 = localStorage.getItem("properties1");
   const properties2 = localStorage.getItem("properties2");
+  const openingMessage = localStorage.getItem("openingMessage");
 
   if (model1) $("#model-selection-1").val(model1);
   if (model2) $("#model-selection-2").val(model2);
   if (properties1) $("#agent-properties-1").val(properties1);
   if (properties2) $("#agent-properties-2").val(properties2);
+  if (openingMessage) $("#agent-opening-message-1").val(openingMessage);
 }
 
 const MAX_PROGRESS_LINES = 10;
@@ -95,6 +99,12 @@ const initProgressCallback = (report) => {
 };
 
 async function loadModels() {
+  if (window.chat !== undefined) {
+    console.log("Stopping chat before loading models...");
+    window.chat.stop();
+    window.chat = undefined;
+  }
+
   console.log("Loading models...");
 
   // Disable the Load button
@@ -105,11 +115,19 @@ async function loadModels() {
   $("#chat-box").empty();
 
   try {
-    window.engine = await webllm.CreateWebWorkerMLCEngine(
-      new Worker(new URL("./worker.js", import.meta.url), { type: "module" }),
-      [$("#model-selection-1").val(), $("#model-selection-2").val()],
-      { initProgressCallback: initProgressCallback }
+    // create a new chat instance
+    const chat = new Chat(
+      $("#agent-properties-1").val(),
+      $("#agent-properties-2").val()
     );
+
+    await chat.initialize(
+      $("#model-selection-1").val(),
+      $("#model-selection-2").val(),
+      initProgressCallback
+    );
+
+    window.chat = chat;
     console.log("Chat engine initialized successfully");
 
     // Enable the Chat button
@@ -128,30 +146,37 @@ async function loadModels() {
 }
 
 function startChat() {
-  console.log("Starting chat...");
+  if (window.chat === undefined) {
+    console.log("Chat not initialized");
+    return;
+  }
 
   // Disable the Chat button and enable the Stop button
   $("#start-chat").prop("disabled", true);
   $("#stop-chat").prop("disabled", false);
 
-  // Collapse the configuration section
-  $("#configCollapse").collapse("hide");
+  if (window.chat.stopped) {
+    console.log("Resuming chat...");
+    windows.chat.resume();
+  } else {
+    console.log("Starting chat...");
+    // Collapse the configuration section
+    $("#configCollapse").collapse("hide");
 
-  // Clear the console output
-  $("#chat-box").empty();
+    // Clear the console output
+    $("#chat-box").empty();
 
-  // Add a status message
-  $("#chat-box").append(
-    $("<div>").addClass("status-message").text("Models loaded. Chat is ready.")
-  );
-
-  // Scroll to the bottom
-  scrollChatToBottom();
-
-  // Add your chat initialization logic here
+    // start the chat with the opening message
+    window.chat.start($("#agent-opening-message-1").val());
+  }
 }
 
 function stopChat() {
+  if (window.chat === undefined) {
+    console.log("Chat not initialized");
+    return;
+  }
+
   console.log("Stopping chat...");
 
   // Disable the Stop button and enable the Chat button
@@ -162,7 +187,7 @@ function stopChat() {
   // Expand the configuration section
   $("#configCollapse").collapse("show");
 
-  // Add your chat stopping logic here
+  window.chat.stop();
 }
 
 function scrollChatToBottom() {
