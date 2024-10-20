@@ -141,7 +141,7 @@ async function loadModels() {
     $("#chat-box").append(
       $("<div>")
         .addClass("console-output")
-        .text("Error: " + error.message)
+        .text("Error: " + error)
     );
 
     // Re-enable the Load button if there's an error
