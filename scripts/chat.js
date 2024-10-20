@@ -2,10 +2,18 @@ import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 import ChatState from "./chatState.js";
 
 class Chat {
-  constructor(agentProperties1, agentProperties2, onNewMessage) {
+  constructor(
+    agentProperties1,
+    agentProperties2,
+    onNewMessage,
+    onUpdateLastMessage,
+    onThinking
+  ) {
     this.chatState = new ChatState(agentProperties1, agentProperties2);
     this.isStopped = false;
     this.onNewMessage = onNewMessage;
+    this.onUpdateLastMessage = onUpdateLastMessage;
+    this.onThinking = onThinking;
   }
 
   get initialized() {
@@ -51,15 +59,18 @@ class Chat {
 
   async chatLoop() {
     while (!this.isStopped) {
+      const agentLabel = this.agent1IsUser ? "agent-2" : "agent-1";
+
+      // Call the onThinking callback
+      this.onThinking(agentLabel);
+
       const transcript = this.agent1IsUser
         ? this.chatState.getTranscriptForAgent2()
         : this.chatState.getTranscriptForAgent1();
       const request = {
         stream: false,
-        //stream_options: { include_usage: false },
         messages: transcript,
-        model: this.agent1IsUser ? this.model2 : this.model1, // agent2 is the user so pass agent1's model
-        //: 128,
+        model: this.agent1IsUser ? this.model2 : this.model1,
       };
       const asyncChunkGenerator = await this.engine.chat.completions.create(
         request
@@ -68,9 +79,9 @@ class Chat {
       const message = this.agent1IsUser
         ? await this.engine.getMessage(this.model2)
         : await this.engine.getMessage(this.model1);
-      const agentLabel = this.agent1IsUser ? "agent-2" : "agent-1";
+
       this.chatState.addMessage(agentLabel, message);
-      this.onNewMessage(agentLabel, message);
+      this.onUpdateLastMessage(agentLabel, message);
 
       // flip to the other agent
       this.agent1IsUser = !this.agent1IsUser;

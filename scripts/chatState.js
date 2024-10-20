@@ -16,6 +16,10 @@ class ChatState {
     this.transcript = [];
   }
 
+  getFullTranscript() {
+    return this.transcript;
+  }
+
   getTranscriptForAgent1() {
     const modifiedTranscript = this.transcript.map((message) => {
       if (message.role === "agent-1") {

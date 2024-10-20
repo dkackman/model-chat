@@ -42,6 +42,7 @@ $(document).ready(function () {
   $("#load-models").on("click", loadModels);
   $("#start-chat").on("click", startChat);
   $("#stop-chat").on("click", stopChat);
+  $("#copy-transcript").on("click", copyTranscript);
 });
 
 function saveSelections() {
@@ -119,7 +120,9 @@ async function loadModels() {
     const chat = new Chat(
       $("#agent-properties-1").val(),
       $("#agent-properties-2").val(),
-      insertMessage // Pass the insertMessage function as a callback
+      insertMessage,
+      updateLastMessage,
+      insertThinkingMessage
     );
 
     await chat.initialize(
@@ -155,6 +158,7 @@ function startChat() {
   // Disable the Chat button and enable the Stop button
   $("#start-chat").prop("disabled", true);
   $("#stop-chat").prop("disabled", false);
+  $("#copy-transcript").prop("disabled", false);
 
   if (window.chat.stopped) {
     console.log("Resuming chat...");
@@ -204,4 +208,45 @@ function insertMessage(agent, content) {
 
   // Use the debounced scroll function
   debouncedScrollChatToBottom();
+}
+
+function insertThinkingMessage(agent) {
+  insertMessage(agent, "Thinking...");
+}
+
+function updateLastMessage(agent, content) {
+  const chatBox = $("#chat-box");
+  const lastMessage = chatBox.find(`.message.${agent}`).last();
+  lastMessage.find(".message-content").text(content);
+
+  // Use the debounced scroll function
+  debouncedScrollChatToBottom();
+}
+
+function copyTranscript() {
+  if (window.chat === undefined || !window.chat.initialized) {
+    console.log("Chat not initialized");
+    return;
+  }
+
+  const transcript = window.chat.chatState.getFullTranscript();
+  const formattedTranscript = transcript
+    .map((message) => `${message.role}: ${message.content}`)
+    .join("\n\n");
+
+  navigator.clipboard.writeText(formattedTranscript).then(
+    () => {
+      console.log("Transcript copied to clipboard");
+      // show a temporary message to the user
+      const button = $("#copy-transcript");
+      const originalText = button.text();
+      button.text("Copied!");
+      setTimeout(() => {
+        button.text(originalText);
+      }, 2000);
+    },
+    (err) => {
+      console.error("Could not copy text: ", err);
+    }
+  );
 }
