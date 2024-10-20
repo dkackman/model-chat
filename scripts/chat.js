@@ -59,7 +59,7 @@ class Chat {
         //stream_options: { include_usage: false },
         messages: transcript,
         model: this.agent1IsUser ? this.model2 : this.model1, // agent2 is the user so pass agent1's model
-        max_tokens: 128,
+        //: 128,
       };
       const asyncChunkGenerator = await this.engine.chat.completions.create(
         request
