@@ -89,9 +89,10 @@ class Chat {
         messages: transcript,
         model: this.agent1IsUser ? this.model2 : this.model1,
         frequency_penalty: 0.75,
-        presence_penalty: 0.75,
-        temperature: 0.3,
-        max_tokens: 128,
+        presence_penalty: 1,
+        temperature: 0.1,
+        top_p: 0.5,
+        max_tokens: 512,
       };
 
       try {
