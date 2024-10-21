@@ -39,8 +39,7 @@ $(document).ready(function () {
   $(selectors).on("change input", saveSelections);
 
   // Add click handlers for the buttons
-  $("#load-models").on("click", loadModels);
-  $("#start-chat").on("click", startChat);
+  $("#start-chat").on("click", loadAndStartChat);
   $("#stop-chat").on("click", stopChat);
   $("#abort-chat").on("click", abortChat);
   $("#copy-transcript").on("click", copyTranscript);
@@ -102,6 +101,28 @@ const initProgressCallback = (report) => {
   debouncedScrollChatToBottom();
 };
 
+async function loadAndStartChat() {
+  try {
+    setButtonsState(false);
+    $("#start-chat").prop("disabled", true);
+
+    if (window.chat === undefined || !window.chat.initialized) {
+      await loadModels();
+    }
+    startChat();
+    setButtonsState(true);
+  } catch (error) {
+    console.error("Error starting chat:", error);
+    setButtonsState(false);
+  }
+}
+
+function setButtonsState(chatting) {
+  $("#start-chat").prop("disabled", chatting);
+  $("#stop-chat").prop("disabled", !chatting);
+  $("#abort-chat").prop("disabled", !chatting);
+}
+
 async function loadModels() {
   if (window.chat !== undefined) {
     console.log("Stopping chat before loading models...");
@@ -111,8 +132,6 @@ async function loadModels() {
 
   console.log("Loading models...");
 
-  // Disable the Load button
-  $("#load-models").prop("disabled", true);
   // Collapse the configuration section
   $("#configCollapse").collapse("hide");
   // Clear previous chat content
@@ -137,9 +156,6 @@ async function loadModels() {
 
     window.chat = chat;
     console.log("Chat engine initialized successfully");
-
-    // Enable the Chat button
-    $("#start-chat").prop("disabled", false);
   } catch (error) {
     console.error("Error initializing chat engine:", error);
     $("#chat-box").append(
@@ -147,9 +163,6 @@ async function loadModels() {
         .addClass("console-output")
         .text("Error: " + error)
     );
-
-    // Re-enable the Load button if there's an error
-    $("#load-models").prop("disabled", false);
   }
 }
 
@@ -158,12 +171,6 @@ function startChat() {
     console.log("Chat not initialized");
     return;
   }
-
-  // Disable the Chat button and enable the Stop button
-  $("#start-chat").prop("disabled", true);
-  $("#stop-chat").prop("disabled", false);
-  $("#abort-chat").prop("disabled", false);
-  $("#copy-transcript").prop("disabled", false);
 
   if (window.chat.stopped) {
     console.log("Resuming chat...");
@@ -189,11 +196,7 @@ function stopChat() {
 
   console.log("Stopping chat...");
 
-  // Disable the Stop button and enable the Chat button
-  $("#stop-chat").prop("disabled", true);
-  $("#abort-chat").prop("disabled", true);
-  $("#start-chat").prop("disabled", false);
-  $("#load-models").prop("disabled", false);
+  setButtonsState(false);
 
   window.chat.stop();
 }
@@ -206,13 +209,10 @@ function abortChat() {
 
   console.log("Aborting chat...");
 
-  // Disable the Stop button and enable the Chat button
-  $("#stop-chat").prop("disabled", true);
-  $("#abort-chat").prop("disabled", true);
-  $("#start-chat").prop("disabled", false);
-  $("#load-models").prop("disabled", false);
+  setButtonsState(false);
 
   window.chat.abort();
+  window.chat = undefined;
 }
 
 function scrollChatToBottom() {
@@ -253,7 +253,7 @@ function streamingMessage(agent, content) {
   // Append the new content to the existing message, replacing newlines with <br>
   messageContent.html(messageContent.html() + content.replace(/\n/g, "<br>"));
 
-  debouncedScrollChatToBottom();
+  scrollChatToBottom();
 }
 
 function updateLastMessage(agent, content) {
