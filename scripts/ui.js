@@ -34,8 +34,9 @@ $(document).ready(function () {
   restoreSelections();
 
   // Save selections and properties when changed
-  $("#model-selection-1, #model-selection-2, #agent-properties-1, #agent-properties-2, #agent-opening-message-1")
-    .on("change input", saveSelections);
+  const selectors =
+    "#model-selection-1, #model-selection-2, #agent-properties-1, #agent-properties-2, #agent-opening-message-1";
+  $(selectors).on("change input", saveSelections);
 
   // Add click handlers for the buttons
   $("#load-models").on("click", loadModels);
