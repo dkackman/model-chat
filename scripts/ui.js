@@ -224,7 +224,7 @@ function insertThinkingMessage(agent) {
 
 // Add this function after the existing functions
 function insertMessage(agent, content) {
-  content = content ? content.trim() : "";
+  content = content ?? "";
   const chatBox = $("#chat-box");
   const messageDiv = $("<div>").addClass(`message ${agent}`);
   const messageContent = $("<div>")
@@ -239,7 +239,7 @@ function insertMessage(agent, content) {
 }
 
 function streamingMessage(agent, content) {
-  content = content ? content : "";
+  content = content ?? "";
   const chatBox = $("#chat-box");
   const lastMessage = chatBox.find(`.message.${agent}`).last();
   let messageContent = lastMessage.find(".message-content");
@@ -257,7 +257,7 @@ function streamingMessage(agent, content) {
 }
 
 function updateLastMessage(agent, content) {
-  content = content ? content.trim() : "";
+  content = content ?? "";
 
   const chatBox = $("#chat-box");
   const lastMessage = chatBox.find(`.message.${agent}`).last();
