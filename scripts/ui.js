@@ -218,11 +218,18 @@ function scrollChatToBottom() {
   chatBox.scrollTop(chatBox[0].scrollHeight);
 }
 
+function insertThinkingMessage(agent) {
+  insertMessage(agent, "Thinking...");
+}
+
 // Add this function after the existing functions
 function insertMessage(agent, content) {
+  content = content ? content.trim() : "";
   const chatBox = $("#chat-box");
   const messageDiv = $("<div>").addClass(`message ${agent}`);
-  const messageContent = $("<div>").addClass("message-content").text(content);
+  const messageContent = $("<div>")
+    .addClass("message-content")
+    .html(content.replace(/\n/g, "<br>"));
 
   messageDiv.append(messageContent);
   chatBox.append(messageDiv);
@@ -231,28 +238,30 @@ function insertMessage(agent, content) {
   debouncedScrollChatToBottom();
 }
 
-function insertThinkingMessage(agent) {
-  insertMessage(agent, "Thinking...");
-}
-
 function streamingMessage(agent, content) {
+  content = content ? content : "";
   const chatBox = $("#chat-box");
   const lastMessage = chatBox.find(`.message.${agent}`).last();
   let messageContent = lastMessage.find(".message-content");
 
   // If the last message text is "Thinking...", replace it with an empty string
   if (messageContent.text().trim() === "Thinking...") {
-    messageContent.text("");
+    messageContent.html("");
   }
 
-  // Append the new content to the existing message
-  messageContent.text(messageContent.text() + content);
+  // Append the new content to the existing message, replacing newlines with <br>
+  messageContent.html(messageContent.html() + content.replace(/\n/g, "<br>"));
+
+  // Use the debounced scroll function
+  debouncedScrollChatToBottom();
 }
 
 function updateLastMessage(agent, content) {
+  content = content ? content.trim() : "";
+
   const chatBox = $("#chat-box");
   const lastMessage = chatBox.find(`.message.${agent}`).last();
-  lastMessage.find(".message-content").text(content);
+  lastMessage.find(".message-content").html(content.replace(/\n/g, "<br>"));
 
   // Use the debounced scroll function
   debouncedScrollChatToBottom();

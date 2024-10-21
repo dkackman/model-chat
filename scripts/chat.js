@@ -26,12 +26,20 @@ class Chat {
     this.model1 = model1;
     this.model2 = model2;
 
+    const opts = {
+      context_window_size: -1,
+      sliding_window_size: 4096 / 2,
+      attention_sink_size: 0,
+    }; //ChatOptions
+
     // if both models are the same only load it once
     const models = model1 === model2 ? [model1] : [model1, model2];
+    const chatOpts = model1 === model2 ? opts : [opts, opts];
     this.engine = await webllm.CreateWebWorkerMLCEngine(
       new Worker(new URL("./worker.js", import.meta.url), { type: "module" }),
       models,
-      { initProgressCallback: initProgressCallback } // MLCEngineConfig
+      { initProgressCallback: initProgressCallback }, // MLCEngineConfig
+      chatOpts
     );
   }
 
