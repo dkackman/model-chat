@@ -29,7 +29,8 @@ class Chat {
     const opts = {
       context_window_size: -1,
       sliding_window_size: 4096,
-      attention_sink_size: 1024,
+      attention_sink_size: 4094,
+      max_tokens: 1024,
     }; //ChatOptions
 
     // if both models are the same only load it once
@@ -91,6 +92,7 @@ class Chat {
         frequency_penalty: 0.5,
         presence_penalty: 0.5,
         temperature: 0.4,
+        max_tokens: 1024,
       };
 
       try {
