@@ -55,8 +55,10 @@ function saveSelections() {
 }
 
 function restoreSelections() {
-  const model1 = localStorage.getItem("model1");
-  const model2 = localStorage.getItem("model2");
+  const model1 =
+    localStorage.getItem("model1") ?? "Qwen2.5-3B-Instruct-q4f16_1-MLC";
+  const model2 =
+    localStorage.getItem("model2") ?? "Hermes-3-Llama-3.1-8B-q4f16_1-MLC";
   const properties1 = localStorage.getItem("properties1");
   const properties2 = localStorage.getItem("properties2");
   const openingMessage = localStorage.getItem("openingMessage");
