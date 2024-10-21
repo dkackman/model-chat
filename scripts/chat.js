@@ -28,8 +28,8 @@ class Chat {
 
     const opts = {
       context_window_size: -1,
-      sliding_window_size: 4096 / 2,
-      attention_sink_size: 0,
+      sliding_window_size: 4096,
+      attention_sink_size: 1024,
     }; //ChatOptions
 
     // if both models are the same only load it once
@@ -88,24 +88,34 @@ class Chat {
         stream_options: { include_usage: false },
         messages: transcript,
         model: this.agent1IsUser ? this.model2 : this.model1,
+        frequency_penalty: 0.5,
+        presence_penalty: 0.5,
+        temperature: 0.4,
       };
-      const asyncChunkGenerator = await this.engine.chat.completions.create(
-        request
-      );
 
-      // this streams the response to the ui
-      for await (const chunk of asyncChunkGenerator) {
-        const messagePart = chunk.choices[0]?.delta?.content;
-        this.onStreamingMessage(agentLabel, messagePart);
+      try {
+        const asyncChunkGenerator = await this.engine.chat.completions.create(
+          request
+        );
+
+        // this streams the response to the ui
+        for await (const chunk of asyncChunkGenerator) {
+          const messagePart = chunk.choices[0]?.delta?.content;
+          this.onStreamingMessage(agentLabel, messagePart);
+        }
+
+        // this gets the final message and adds it to the chat state
+        const message = this.agent1IsUser
+          ? await this.engine.getMessage(this.model2)
+          : await this.engine.getMessage(this.model1);
+
+        this.chatState.addMessage(agentLabel, message);
+        this.onUpdateLastMessage(agentLabel, message);
+      } catch (error) {
+        console.error("Error generating response:", error);
+        this.onUpdateLastMessage(agentLabel, "Error generating response");
+        this.stop();
       }
-
-      // this gets the final message and adds it to the chat state
-      const message = this.agent1IsUser
-        ? await this.engine.getMessage(this.model2)
-        : await this.engine.getMessage(this.model1);
-
-      this.chatState.addMessage(agentLabel, message);
-      this.onUpdateLastMessage(agentLabel, message);
 
       // flip to the other agent
       this.agent1IsUser = !this.agent1IsUser;

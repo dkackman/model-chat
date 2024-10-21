@@ -234,7 +234,6 @@ function insertMessage(agent, content) {
   messageDiv.append(messageContent);
   chatBox.append(messageDiv);
 
-  // Use the debounced scroll function
   debouncedScrollChatToBottom();
 }
 
@@ -252,7 +251,6 @@ function streamingMessage(agent, content) {
   // Append the new content to the existing message, replacing newlines with <br>
   messageContent.html(messageContent.html() + content.replace(/\n/g, "<br>"));
 
-  // Use the debounced scroll function
   debouncedScrollChatToBottom();
 }
 
@@ -263,7 +261,6 @@ function updateLastMessage(agent, content) {
   const lastMessage = chatBox.find(`.message.${agent}`).last();
   lastMessage.find(".message-content").html(content.replace(/\n/g, "<br>"));
 
-  // Use the debounced scroll function
   debouncedScrollChatToBottom();
 }
 
