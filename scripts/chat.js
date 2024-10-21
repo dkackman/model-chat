@@ -31,7 +31,7 @@ class Chat {
     this.engine = await webllm.CreateWebWorkerMLCEngine(
       new Worker(new URL("./worker.js", import.meta.url), { type: "module" }),
       models,
-      { initProgressCallback: initProgressCallback }
+      { initProgressCallback: initProgressCallback } // MLCEngineConfig
     );
   }
 
@@ -44,6 +44,13 @@ class Chat {
     this.isStopped = false;
 
     await this.chatLoop();
+  }
+
+  abort() {
+    if (this.engine) {
+      this.engine.interruptGenerate();
+    }
+    this.isStopped = true;
   }
 
   stop() {

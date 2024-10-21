@@ -42,6 +42,7 @@ $(document).ready(function () {
   $("#load-models").on("click", loadModels);
   $("#start-chat").on("click", startChat);
   $("#stop-chat").on("click", stopChat);
+  $("#abort-chat").on("click", abortChat);
   $("#copy-transcript").on("click", copyTranscript);
 });
 
@@ -159,6 +160,7 @@ function startChat() {
   // Disable the Chat button and enable the Stop button
   $("#start-chat").prop("disabled", true);
   $("#stop-chat").prop("disabled", false);
+  $("#abort-chat").prop("disabled", false);
   $("#copy-transcript").prop("disabled", false);
 
   if (window.chat.stopped) {
@@ -187,10 +189,28 @@ function stopChat() {
 
   // Disable the Stop button and enable the Chat button
   $("#stop-chat").prop("disabled", true);
+  $("#abort-chat").prop("disabled", true);
   $("#start-chat").prop("disabled", false);
   $("#load-models").prop("disabled", false);
 
   window.chat.stop();
+}
+
+function abortChat() {
+  if (window.chat === undefined) {
+    console.log("Chat not initialized");
+    return;
+  }
+
+  console.log("Aborting chat...");
+
+  // Disable the Stop button and enable the Chat button
+  $("#stop-chat").prop("disabled", true);
+  $("#abort-chat").prop("disabled", true);
+  $("#start-chat").prop("disabled", false);
+  $("#load-models").prop("disabled", false);
+
+  window.chat.abort();
 }
 
 function scrollChatToBottom() {
