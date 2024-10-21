@@ -30,7 +30,6 @@ class Chat {
       context_window_size: -1,
       sliding_window_size: 4096,
       attention_sink_size: 4094,
-      max_tokens: 1024,
     }; //ChatOptions
 
     // if both models are the same only load it once
@@ -89,10 +88,10 @@ class Chat {
         stream_options: { include_usage: false },
         messages: transcript,
         model: this.agent1IsUser ? this.model2 : this.model1,
-        frequency_penalty: 0.5,
-        presence_penalty: 0.5,
-        temperature: 0.4,
-        max_tokens: 1024,
+        frequency_penalty: 0.75,
+        presence_penalty: 0.75,
+        temperature: 0.3,
+        max_tokens: 128,
       };
 
       try {
