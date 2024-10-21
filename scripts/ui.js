@@ -227,9 +227,6 @@ function streamingMessage(agent, content) {
 
   // Append the new content to the existing message
   messageContent.text(messageContent.text() + content);
-
-  // Use the debounced scroll function
-  debouncedScrollChatToBottom();
 }
 
 function updateLastMessage(agent, content) {
