@@ -73,6 +73,21 @@
     margin-top: 5px;
 }
 
+.color-indicator
+{
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.color-indicator.agent-1 {
+    background-color: #c26d28;
+}
+
+.color-indicator.agent-2 {
+    background-color: #0d6efd;
+}
+
 /* Console Output Styling */
 .console-output {
     font-family: 'Courier New', Courier, monospace;
