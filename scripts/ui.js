@@ -163,6 +163,8 @@ async function loadModels() {
         .addClass("console-output")
         .text("Error: " + error)
     );
+    
+    throw new Error("Chat engine initialization failed");
   }
 }
 
