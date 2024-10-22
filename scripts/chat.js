@@ -56,6 +56,7 @@ class Chat {
   abort() {
     if (this.engine) {
       this.engine.interruptGenerate();
+      this.engine.unload();
     }
 
     this.onNewMessage(
