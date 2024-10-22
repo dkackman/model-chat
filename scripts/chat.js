@@ -10,10 +10,10 @@ class Chat {
     onUpdateLastMessage
   ) {
     this.chatState = new ChatState(agentProperties1, agentProperties2);
-    this.isPaused = false;
     this.onNewMessage = onNewMessage;
     this.onStreamingMessage = onStreamingMessage;
     this.onUpdateLastMessage = onUpdateLastMessage;
+    this.isPaused = false;
   }
 
   get initialized() {
@@ -32,6 +32,7 @@ class Chat {
 
     // if both models are the same only load it once
     const models = model1 === model2 ? [model1] : [model1, model2];
+    // there has to be one opts per model
     const chatOpts = model1 === model2 ? opts : [opts, opts];
     this.engine = await webllm.CreateWebWorkerMLCEngine(
       new Worker(new URL("./worker.js", import.meta.url), { type: "module" }),
@@ -119,7 +120,7 @@ class Chat {
         this.onUpdateLastMessage(agentLabel, message);
       } catch (error) {
         console.error("Error generating response:", error);
-        this.onUpdateLastMessage(agentLabel, "Error generating response");
+        this.onNewMessage("error", "Error generating response: " + error);
         this.pause();
       }
 

@@ -1,6 +1,11 @@
 import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 import Chat from "./chat.js";
 
+function scrollChatToBottom() {
+  const chatBox = $("#chat-box");
+  chatBox.scrollTop(chatBox[0].scrollHeight);
+}
+
 const debounce = (func, wait) => {
   let timeout;
   return function executedFunction(...args) {
@@ -213,11 +218,6 @@ function abortChat() {
 
   window.chat.abort();
   window.chat = undefined;
-}
-
-function scrollChatToBottom() {
-  const chatBox = $("#chat-box");
-  chatBox.scrollTop(chatBox[0].scrollHeight);
 }
 
 // Add this function after the existing functions

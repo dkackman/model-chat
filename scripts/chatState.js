@@ -32,6 +32,7 @@ class ChatState {
 
       return message;
     });
+
     return [this.agentProperties1, ...modifiedTranscript];
   }
 
@@ -47,6 +48,7 @@ class ChatState {
 
       return message;
     });
+
     return [this.agentProperties2, ...modifiedTranscript];
   }
 
