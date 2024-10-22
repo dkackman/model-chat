@@ -269,11 +269,8 @@ function copyTranscript() {
   }
 
   const transcript = window.chat.chatState.getFullTranscript();
-  const formattedTranscript = transcript
-    .map((message) => `${message.role}: ${message.content}`)
-    .join("\n\n");
 
-  navigator.clipboard.writeText(formattedTranscript).then(
+  navigator.clipboard.writeText(JSON.stringify(transcript, null, 2)).then(
     () => {
       console.log("Transcript copied to clipboard");
 

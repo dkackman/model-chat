@@ -83,16 +83,14 @@ class Chat {
   async chatLoop() {
     while (!this.isPaused) {
       const agentLabel = this.agent1IsUser ? "agent-2" : "agent-1";
+      const userLabel = this.agent1IsUser ? "agent-1" : "agent-2";
 
       this.onNewMessage(agentLabel, "Thinking...");
 
-      const transcript = this.agent1IsUser
-        ? this.chatState.getTranscriptForAgent2()
-        : this.chatState.getTranscriptForAgent1();
       const request = {
         stream: true,
         stream_options: { include_usage: false },
-        messages: transcript,
+        messages: this.chatState.getTranscriptForAgent(agentLabel, userLabel),
         model: this.agent1IsUser ? this.model2 : this.model1,
         frequency_penalty: 0.75,
         presence_penalty: 1,

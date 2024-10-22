@@ -4,52 +4,41 @@
 
 class ChatState {
   constructor(agentProperties1, agentProperties2) {
-    this.agentProperties1 = {
+    this.agentProperties = new Map();
+    this.agentProperties.set("agent-1", {
       role: "system",
       content: agentProperties1 ? agentProperties1.trim() : "",
-    };
-    this.agentProperties2 = {
+    });
+    this.agentProperties.set("agent-2", {
       role: "system",
       content: agentProperties2 ? agentProperties2.trim() : "",
-    };
-
+    });
     this.transcript = [];
   }
 
   getFullTranscript() {
-    return this.transcript;
+    // prepend the agent properties to the transcript
+    return [
+      { ...this.agentProperties.get("agent-1"), role: "agent-1" },
+      { ...this.agentProperties.get("agent-2"), role: "agent-2" },
+      ...this.transcript,
+    ];
   }
 
-  getTranscriptForAgent1() {
+  getTranscriptForAgent(assistantAgent, userAgent) {
     const modifiedTranscript = this.transcript.map((message) => {
-      if (message.role === "agent-1") {
+      if (message.role === assistantAgent) {
         return { ...message, role: "assistant" };
       }
 
-      if (message.role === "agent-2") {
+      if (message.role === userAgent) {
         return { ...message, role: "user" };
       }
 
       return message;
     });
 
-    return [this.agentProperties1, ...modifiedTranscript];
-  }
-
-  getTranscriptForAgent2() {
-    const modifiedTranscript = this.transcript.map((message) => {
-      if (message.role === "agent-2") {
-        return { ...message, role: "assistant" };
-      }
-
-      if (message.role === "agent-1") {
-        return { ...message, role: "user" };
-      }
-
-      return message;
-    });
-
-    return [this.agentProperties2, ...modifiedTranscript];
+    return [this.agentProperties.get(assistantAgent), ...modifiedTranscript];
   }
 
   addMessage(agent, content) {
