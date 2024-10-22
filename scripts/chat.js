@@ -7,15 +7,13 @@ class Chat {
     agentProperties2,
     onNewMessage,
     onStreamingMessage,
-    onUpdateLastMessage,
-    onThinking
+    onUpdateLastMessage
   ) {
     this.chatState = new ChatState(agentProperties1, agentProperties2);
-    this.isStopped = false;
+    this.isPaused = false;
     this.onNewMessage = onNewMessage;
     this.onStreamingMessage = onStreamingMessage;
     this.onUpdateLastMessage = onUpdateLastMessage;
-    this.onThinking = onThinking;
   }
 
   get initialized() {
@@ -49,7 +47,7 @@ class Chat {
     this.chatState.addMessage("agent-1", firstMessage);
     this.onNewMessage("agent-1", firstMessage);
 
-    this.isStopped = false;
+    this.isPaused = false;
 
     await this.chatLoop();
   }
@@ -58,27 +56,33 @@ class Chat {
     if (this.engine) {
       this.engine.interruptGenerate();
     }
-    this.isStopped = true;
+
+    this.onNewMessage(
+      "error",
+      "Chat was reset. Press Start to reload the LLMs and begin again."
+    );
+
+    this.isPaused = true;
   }
 
-  stop() {
-    this.isStopped = true;
+  pause() {
+    this.isPaused = true;
   }
 
   async resume() {
-    this.isStopped = false;
+    this.isPaused = false;
     await this.chatLoop();
   }
 
-  get stopped() {
-    return this.isStopped;
+  get paused() {
+    return this.isPaused;
   }
 
   async chatLoop() {
-    while (!this.isStopped) {
+    while (!this.isPaused) {
       const agentLabel = this.agent1IsUser ? "agent-2" : "agent-1";
 
-      this.onThinking(agentLabel);
+      this.onNewMessage(agentLabel, "Thinking...");
 
       const transcript = this.agent1IsUser
         ? this.chatState.getTranscriptForAgent2()
@@ -116,7 +120,7 @@ class Chat {
       } catch (error) {
         console.error("Error generating response:", error);
         this.onUpdateLastMessage(agentLabel, "Error generating response");
-        this.stop();
+        this.pause();
       }
 
       // flip to the other agent

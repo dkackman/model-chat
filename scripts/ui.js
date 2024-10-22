@@ -40,7 +40,7 @@ $(document).ready(function () {
 
   // Add click handlers for the buttons
   $("#start-chat").on("click", loadAndStartChat);
-  $("#stop-chat").on("click", stopChat);
+  $("#pause-chat").on("click", pauseChat);
   $("#abort-chat").on("click", abortChat);
   $("#copy-transcript").on("click", copyTranscript);
 });
@@ -119,14 +119,14 @@ async function loadAndStartChat() {
 
 function setButtonsState(chatting) {
   $("#start-chat").prop("disabled", chatting);
-  $("#stop-chat").prop("disabled", !chatting);
+  $("#pause-chat").prop("disabled", !chatting);
   $("#abort-chat").prop("disabled", !chatting);
 }
 
 async function loadModels() {
   if (window.chat !== undefined) {
-    console.log("Stopping chat before loading models...");
-    window.chat.stop();
+    console.log("Pausing chat before loading models...");
+    window.chat.pause();
     window.chat = undefined;
   }
 
@@ -144,8 +144,7 @@ async function loadModels() {
       $("#agent-properties-2").val(),
       insertMessage,
       streamingMessage,
-      updateLastMessage,
-      insertThinkingMessage
+      updateLastMessage
     );
 
     await chat.initialize(
@@ -157,14 +156,13 @@ async function loadModels() {
     window.chat = chat;
     console.log("Chat engine initialized successfully");
   } catch (error) {
-    console.error("Error initializing chat engine:", error);
     $("#chat-box").append(
       $("<div>")
         .addClass("console-output")
         .text("Error: " + error)
     );
-    
-    throw new Error("Chat engine initialization failed");
+
+    throw error;
   }
 }
 
@@ -174,7 +172,7 @@ function startChat() {
     return;
   }
 
-  if (window.chat.stopped) {
+  if (window.chat.paused) {
     console.log("Resuming chat...");
     window.chat.resume();
   } else {
@@ -190,17 +188,17 @@ function startChat() {
   }
 }
 
-function stopChat() {
+function pauseChat() {
   if (window.chat === undefined) {
     console.log("Chat not initialized");
     return;
   }
 
-  console.log("Stopping chat...");
+  console.log("Pausing chat...");
 
   setButtonsState(false);
 
-  window.chat.stop();
+  window.chat.pause();
 }
 
 function abortChat() {
@@ -220,10 +218,6 @@ function abortChat() {
 function scrollChatToBottom() {
   const chatBox = $("#chat-box");
   chatBox.scrollTop(chatBox[0].scrollHeight);
-}
-
-function insertThinkingMessage(agent) {
-  insertMessage(agent, "Thinking...");
 }
 
 // Add this function after the existing functions
@@ -270,7 +264,7 @@ function updateLastMessage(agent, content) {
 
 function copyTranscript() {
   if (window.chat === undefined || !window.chat.initialized) {
-    console.log("Chat not initialized");
+    console.log("Chat not initialized. Nothing copied.");
     return;
   }
 
@@ -282,6 +276,7 @@ function copyTranscript() {
   navigator.clipboard.writeText(formattedTranscript).then(
     () => {
       console.log("Transcript copied to clipboard");
+
       // show a temporary message to the user
       const button = $("#copy-transcript");
       const originalText = button.text();
