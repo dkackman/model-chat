@@ -146,10 +146,19 @@ async function loadModels() {
     // create a new chat instance
     const chat = new Chat(
       $("#agent-properties-1").val(),
-      $("#agent-properties-2").val(),
-      insertMessage,
-      streamingMessage,
-      updateLastMessage
+      $("#agent-properties-2").val()
+    );
+
+    chat.addEventListener("newMessage", (e) =>
+      insertMessage(e.detail.agent, e.detail.message)
+    );
+
+    chat.addEventListener("streamingMessage", (e) =>
+      streamingMessage(e.detail.agent, e.detail.message)
+    );
+
+    chat.addEventListener("updateLastMessage", (e) =>
+      updateLastMessage(e.detail.agent, e.detail.message)
     );
 
     await chat.initialize(

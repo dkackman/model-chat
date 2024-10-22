@@ -1,19 +1,32 @@
 import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 import ChatState from "./chatState.js";
 
-class Chat {
+class Chat extends EventTarget {
   constructor(
     agentProperties1,
     agentProperties2,
-    onNewMessage,
     onStreamingMessage,
     onUpdateLastMessage
   ) {
+    super();
     this.chatState = new ChatState(agentProperties1, agentProperties2);
-    this.onNewMessage = onNewMessage;
-    this.onStreamingMessage = onStreamingMessage;
-    this.onUpdateLastMessage = onUpdateLastMessage;
     this.isPaused = false;
+  }
+
+  #onNewMessage(agent, message) {
+    this.dispatchEvent(
+      new CustomEvent("newMessage", { detail: { agent, message } })
+    );
+  }
+  #onStreamingMessage(agent, message) {
+    this.dispatchEvent(
+      new CustomEvent("streamingMessage", { detail: { agent, message } })
+    );
+  }
+  #onUpdateLastMessage(agent, message) {
+    this.dispatchEvent(
+      new CustomEvent("updateLastMessage", { detail: { agent, message } })
+    );
   }
 
   get initialized() {
@@ -46,7 +59,7 @@ class Chat {
     // agent 1 always starts the conversation
     this.agent1IsUser = true;
     this.chatState.addMessage("agent-1", firstMessage);
-    this.onNewMessage("agent-1", firstMessage);
+    this.#onNewMessage("agent-1", firstMessage);
 
     this.isPaused = false;
 
@@ -85,7 +98,7 @@ class Chat {
       const agentLabel = this.agent1IsUser ? "agent-2" : "agent-1";
       const userLabel = this.agent1IsUser ? "agent-1" : "agent-2";
 
-      this.onNewMessage(agentLabel, "Thinking...");
+      this.#onNewMessage(agentLabel, "Thinking...");
 
       const request = {
         stream: true,
@@ -107,7 +120,7 @@ class Chat {
         // this streams the response to the ui
         for await (const chunk of asyncChunkGenerator) {
           const messagePart = chunk.choices[0]?.delta?.content;
-          this.onStreamingMessage(agentLabel, messagePart);
+          this.#onStreamingMessage(agentLabel, messagePart);
         }
 
         // this gets the final message and adds it to the chat state
@@ -116,7 +129,7 @@ class Chat {
           : await this.engine.getMessage(this.model1);
 
         this.chatState.addMessage(agentLabel, message);
-        this.onUpdateLastMessage(agentLabel, message);
+        this.#onUpdateLastMessage(agentLabel, message);
       } catch (error) {
         console.error("Error generating response:", error);
         this.onNewMessage("error", "Error generating response: " + error);
