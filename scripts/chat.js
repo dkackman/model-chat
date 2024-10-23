@@ -2,12 +2,7 @@ import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 import ChatState from "./chatState.js";
 
 class Chat extends EventTarget {
-  constructor(
-    agentProperties1,
-    agentProperties2,
-    onStreamingMessage,
-    onUpdateLastMessage
-  ) {
+  constructor(agentProperties1, agentProperties2) {
     super();
     this.chatState = new ChatState(agentProperties1, agentProperties2);
     this.isPaused = false;
