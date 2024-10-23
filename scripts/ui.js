@@ -130,9 +130,8 @@ function setButtonsState(chatting) {
 
 async function loadModels() {
   if (window.chat !== undefined) {
-    console.log("Pausing chat before loading models...");
-    window.chat.pause();
-    window.chat = undefined;
+    console.log("Chat already initialized");
+    return;
   }
 
   console.log("Loading models...");
@@ -149,17 +148,9 @@ async function loadModels() {
       $("#agent-properties-2").val()
     );
 
-    chat.addEventListener("newMessage", (e) =>
-      insertMessage(e.detail.agent, e.detail.message)
-    );
-
-    chat.addEventListener("streamingMessage", (e) =>
-      streamingMessage(e.detail.agent, e.detail.message)
-    );
-
-    chat.addEventListener("updateLastMessage", (e) =>
-      updateLastMessage(e.detail.agent, e.detail.message)
-    );
+    chat.addEventListener("newMessage", newMessage);
+    chat.addEventListener("streamingMessage", streamingMessage);
+    chat.addEventListener("updateLastMessage", updateLastMessage);
 
     await chat.initialize(
       $("#model-selection-1").val(),
@@ -226,12 +217,21 @@ function abortChat() {
   setButtonsState(false);
 
   window.chat.abort();
+  clearChat();
+}
+
+function clearChat() {
+  window.chat.removeEventListener("newMessage", newMessage);
+  window.chat.removeEventListener("streamingMessage", streamingMessage);
+  window.chat.removeEventListener("updateLastMessage", updateLastMessage);
   window.chat = undefined;
 }
 
 // Add this function after the existing functions
-function insertMessage(agent, content) {
-  content = content ?? "";
+function newMessage(e) {
+  const agent = e.detail.agent;
+  const content = e.detail?.message ?? "";
+
   const chatBox = $("#chat-box");
   const messageDiv = $("<div>").addClass(`message ${agent}`);
   const messageContent = $("<div>")
@@ -244,8 +244,10 @@ function insertMessage(agent, content) {
   debouncedScrollChatToBottom();
 }
 
-function streamingMessage(agent, content) {
-  content = content ?? "";
+function streamingMessage(e) {
+  const agent = e.detail.agent;
+  const content = e.detail?.message ?? "";
+
   const chatBox = $("#chat-box");
   const lastMessage = chatBox.find(`.message.${agent}`).last();
   let messageContent = lastMessage.find(".message-content");
@@ -261,8 +263,9 @@ function streamingMessage(agent, content) {
   scrollChatToBottom();
 }
 
-function updateLastMessage(agent, content) {
-  content = content ?? "";
+function updateLastMessage(e) {
+  const agent = e.detail.agent;
+  const content = e.detail?.message ?? "";
 
   const chatBox = $("#chat-box");
   const lastMessage = chatBox.find(`.message.${agent}`).last();

@@ -67,15 +67,19 @@ class Chat extends EventTarget {
   }
 
   abort() {
+    this.reset();
+
+    this.#onNewMessage(
+      "error",
+      "Chat was reset. Press Start to reload the LLMs and begin again."
+    );
+  }
+
+  reset() {
     if (this.engine) {
       this.engine.interruptGenerate();
       this.engine.unload();
     }
-
-    this.onNewMessage(
-      "error",
-      "Chat was reset. Press Start to reload the LLMs and begin again."
-    );
 
     this.isPaused = true;
   }
