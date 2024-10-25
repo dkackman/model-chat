@@ -131,7 +131,7 @@ class Chat extends EventTarget {
         this.#onUpdateLastMessage(agentLabel, message);
       } catch (error) {
         console.error("Error generating response:", error);
-        this.onNewMessage("error", "Error generating response: " + error);
+        this.#onNewMessage("error", "Error generating response: " + error);
         this.pause();
       }
 
